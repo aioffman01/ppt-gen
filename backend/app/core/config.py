@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     FONT_DIR: Path = BASE_DIR.parent / "FONT"
     TEMPLATE_DIR: Path = BASE_DIR.parent / "TEMPLATE"
     DESIGN_MD_DIR: Path = BASE_DIR.parent / "DESIGN_MD"
+    PROJECTS_DIR: Path = BASE_DIR.parent / "PROJECTS"
     
     # SQLite Configuration
     SQLALCHEMY_DATABASE_URL: str = f"sqlite:///{BASE_DIR}/app.db"
@@ -24,5 +25,7 @@ settings = Settings()
 os.makedirs(settings.FONT_DIR, exist_ok=True)
 os.makedirs(settings.TEMPLATE_DIR, exist_ok=True)
 os.makedirs(settings.DESIGN_MD_DIR, exist_ok=True)
+os.makedirs(settings.PROJECTS_DIR, exist_ok=True)
+
 
 

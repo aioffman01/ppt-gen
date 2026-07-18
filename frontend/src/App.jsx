@@ -32,6 +32,16 @@ function App() {
   const [designMdDescription, setDesignMdDescription] = useState('');
   const [designMdContent, setDesignMdContent] = useState('');
 
+  // Cart states
+  const [cartFonts, setCartFonts] = useState([]);
+  const [cartTemplates, setCartTemplates] = useState([]);
+  const [cartDesignMds, setCartDesignMds] = useState([]);
+  const [cartReferences, setCartReferences] = useState([]);
+
+  // Project states
+  const [projects, setProjects] = useState([]);
+  const [projectTitle, setProjectTitle] = useState('');
+
   // General Reference Form state
   const [refType, setRefType] = useState('link');
   const [refTitle, setRefTitle] = useState('');
@@ -47,7 +57,9 @@ function App() {
     fetchReferences();
     fetchTemplates();
     fetchDesignMds();
+    fetchProjects();
   }, []);
+
 
 
 
@@ -196,6 +208,94 @@ function App() {
       alert(err.message || '삭제 실패');
     }
   };
+
+  const fetchProjects = async () => {
+    try {
+      const data = await client.get('/projects');
+      setProjects(data);
+    } catch (err) {
+      console.error('프로젝트 목록 로드 실패:', err);
+    }
+  };
+
+  const handleCreateProject = async (e) => {
+    e.preventDefault();
+    if (!projectTitle.trim()) {
+      setError('프로젝트 제목을 입력해 주세요.');
+      return;
+    }
+    if (cartFonts.length === 0 && cartTemplates.length === 0 && cartDesignMds.length === 0 && cartReferences.length === 0) {
+      setError('장바구니가 비어 있습니다. 항목을 담은 뒤 프로젝트를 생성해 주세요.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      await client.post('/projects', {
+        title: projectTitle,
+        font_ids: cartFonts.map(f => f.id),
+        template_ids: cartTemplates.map(t => t.id),
+        design_md_ids: cartDesignMds.map(d => d.id),
+        reference_ids: cartReferences.map(r => r.id),
+      });
+
+      setSuccess(`'${projectTitle}' 프로젝트 패키지가 성공적으로 빌드되었습니다!`);
+      setProjectTitle('');
+      setCartFonts([]);
+      setCartTemplates([]);
+      setCartDesignMds([]);
+      setCartReferences([]);
+      fetchProjects();
+    } catch (err) {
+      setError(err.message || '프로젝트 빌드 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteProject = async (id) => {
+    if (!confirm('정말로 이 프로젝트와 생성된 물리 폴더를 영구 삭제하시겠습니까?')) return;
+    try {
+      await client.delete(`/projects/${id}`);
+      fetchProjects();
+    } catch (err) {
+      alert(err.message || '프로젝트 삭제 실패');
+    }
+  };
+
+  const addToCart = (type, item) => {
+    if (type === 'font') {
+      if (cartFonts.find(f => f.id === item.id)) return;
+      setCartFonts([...cartFonts, item]);
+    } else if (type === 'template') {
+      if (cartTemplates.find(t => t.id === item.id)) return;
+      setCartTemplates([...cartTemplates, item]);
+    } else if (type === 'design_md') {
+      if (cartDesignMds.find(d => d.id === item.id)) return;
+      setCartDesignMds([...cartDesignMds, item]);
+    } else if (type === 'reference') {
+      if (cartReferences.find(r => r.id === item.id)) return;
+      setCartReferences([...cartReferences, item]);
+    }
+    setSuccess(`'${item.title}'이(가) 장바구니에 담겼습니다.`);
+    setTimeout(() => setSuccess(''), 2000);
+  };
+
+  const removeFromCart = (type, id) => {
+    if (type === 'font') {
+      setCartFonts(cartFonts.filter(f => f.id !== id));
+    } else if (type === 'template') {
+      setCartTemplates(cartTemplates.filter(t => t.id !== id));
+    } else if (type === 'design_md') {
+      setCartDesignMds(cartDesignMds.filter(d => d.id !== id));
+    } else if (type === 'reference') {
+      setCartReferences(cartReferences.filter(r => r.id !== id));
+    }
+  };
+
 
 
 
@@ -390,14 +490,111 @@ function App() {
         >
           🔗 참고 사이트
         </button>
+        <button 
+          className={`tab-btn ${activeTab === 'projects' ? 'active' : ''}`}
+          onClick={() => { setActiveTab('projects'); setError(''); setSuccess(''); }}
+        >
+          💼 프로젝트 보관함
+        </button>
       </nav>
+
 
 
       {/* Alert Messages */}
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
+      {/* Shopping Cart (장바구니) */}
+      {(cartFonts.length > 0 || cartTemplates.length > 0 || cartDesignMds.length > 0 || cartReferences.length > 0) && (
+        <div className="card cart-card" style={{ marginBottom: '25px', background: 'rgba(245, 247, 245, 0.9)', border: '2px solid var(--accent-light)', backdropFilter: 'blur(10px)', borderRadius: 'var(--radius-lg)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)' }}>
+                🛒 장바구니 리소스 빌더
+              </h2>
+              <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                선택한 리소스를 모아 하나의 프로젝트 디렉토리 패키지로 합칩니다. (디렉토리 참조를 통한 PPT 생성 지원)
+              </p>
+            </div>
+            
+            {/* Project Title and Confirm Form */}
+            <form onSubmit={handleCreateProject} style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <input 
+                type="text" 
+                placeholder="프로젝트 제목 입력 (예: 서비스소개서_최종)" 
+                value={projectTitle}
+                onChange={(e) => setProjectTitle(e.target.value)}
+                style={{ width: '260px', padding: '8px 12px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', background: '#fff', fontSize: '0.9rem' }}
+                required
+              />
+              <button type="submit" className="submit-btn" style={{ padding: '8px 16px', margin: 0 }}>
+                확인 (프로젝트 생성)
+              </button>
+            </form>
+          </div>
+
+          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginTop: '15px', background: 'rgba(255,255,255,0.6)', padding: '12px', borderRadius: 'var(--radius-sm)' }}>
+            {cartFonts.length > 0 && (
+              <div style={{ flex: 1, minWidth: '150px' }}>
+                <strong style={{ fontSize: '0.85rem', color: 'var(--primary)' }}>📂 폰트 ({cartFonts.length})</strong>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
+                  {cartFonts.map(f => (
+                    <span key={f.id} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 8px', fontSize: '0.78rem', background: 'var(--primary-light)', color: 'var(--primary-dark)', borderRadius: '12px', fontWeight: 'bold' }}>
+                      {f.title}
+                      <button type="button" onClick={() => removeFromCart('font', f.id)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '0.75rem', padding: 0, marginLeft: '2px' }}>❌</button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {cartTemplates.length > 0 && (
+              <div style={{ flex: 1, minWidth: '150px' }}>
+                <strong style={{ fontSize: '0.85rem', color: 'var(--accent)' }}>📄 템플릿 ({cartTemplates.length})</strong>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
+                  {cartTemplates.map(t => (
+                    <span key={t.id} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 8px', fontSize: '0.78rem', background: 'rgba(192, 130, 97, 0.15)', color: 'var(--accent)', borderRadius: '12px', fontWeight: 'bold' }}>
+                      {t.title}
+                      <button type="button" onClick={() => removeFromCart('template', t.id)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '0.75rem', padding: 0, marginLeft: '2px' }}>❌</button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {cartDesignMds.length > 0 && (
+              <div style={{ flex: 1, minWidth: '150px' }}>
+                <strong style={{ fontSize: '0.85rem', color: 'var(--primary)' }}>📝 디자인md ({cartDesignMds.length})</strong>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
+                  {cartDesignMds.map(d => (
+                    <span key={d.id} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 8px', fontSize: '0.78rem', background: 'rgba(79, 111, 82, 0.15)', color: 'var(--primary)', borderRadius: '12px', fontWeight: 'bold' }}>
+                      {d.title}
+                      <button type="button" onClick={() => removeFromCart('design_md', d.id)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '0.75rem', padding: 0, marginLeft: '2px' }}>❌</button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {cartReferences.length > 0 && (
+              <div style={{ flex: 1, minWidth: '150px' }}>
+                <strong style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>🔗 사이트 링크 ({cartReferences.length})</strong>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
+                  {cartReferences.map(r => (
+                    <span key={r.id} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 8px', fontSize: '0.78rem', background: 'var(--border-color)', color: 'var(--text-muted)', borderRadius: '12px', fontWeight: 'bold' }}>
+                      {r.title}
+                      <button type="button" onClick={() => removeFromCart('reference', r.id)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontSize: '0.75rem', padding: 0, marginLeft: '2px' }}>❌</button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <main className="main-content">
+
         
         {/* FONTS TAB */}
         {activeTab === 'fonts' && (
@@ -504,7 +701,15 @@ function App() {
                           <h3>{font.title}</h3>
                           <span className="font-filename">{font.originalName}</span>
                         </div>
-                        <div className="font-actions">
+                        <div className="font-actions" style={{ display: 'flex', gap: '4px' }}>
+                          <button 
+                            className="action-btn copy-btn"
+                            onClick={() => addToCart('font', font)}
+                            title="장바구니 담기"
+                            style={{ background: 'var(--primary)', borderColor: 'var(--primary)', color: '#fff' }}
+                          >
+                            🛒 담기
+                          </button>
                           <button 
                             className="action-btn copy-btn"
                             onClick={() => handleCopy(`font-family: 'custom-${font.id}';`, 'CSS font-family 속성이 복사되었습니다!')}
@@ -520,6 +725,7 @@ function App() {
                             🗑️
                           </button>
                         </div>
+
                       </div>
                       <div className="font-preview-area" style={{ fontFamily: `'custom-${font.id}', sans-serif` }}>
                         {previewText || '테스트 문구를 입력해 주세요.'}
@@ -623,14 +829,24 @@ function App() {
                         </p>
                       )}
 
-                      <a 
-                        href={`${BACKEND_BASE}${tmpl.url}`} 
-                        download={tmpl.originalName} 
-                        className="action-btn"
-                        style={{ display: 'inline-block', textDecoration: 'none', textAlign: 'center', fontWeight: 'bold' }}
-                      >
-                        📥 파일 다운로드
-                      </a>
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                        <button 
+                          className="action-btn" 
+                          onClick={() => addToCart('template', tmpl)}
+                          style={{ flex: 1, fontWeight: 'bold', background: 'var(--accent)', borderColor: 'var(--accent)', color: '#fff' }}
+                        >
+                          🛒 담기
+                        </button>
+                        <a 
+                          href={`${BACKEND_BASE}${tmpl.url}`} 
+                          download={tmpl.originalName} 
+                          className="action-btn"
+                          style={{ flex: 1, display: 'inline-block', textDecoration: 'none', textAlign: 'center', fontWeight: 'bold' }}
+                        >
+                          📥 다운로드
+                        </a>
+                      </div>
+
                     </div>
                   ))}
                 </div>
@@ -727,23 +943,31 @@ function App() {
                         </p>
                       )}
 
-                      <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '10px' }}>
+                        <button 
+                          className="action-btn" 
+                          onClick={() => addToCart('design_md', item)}
+                          style={{ flex: 1, minWidth: '70px', fontWeight: 'bold', background: 'var(--primary)', borderColor: 'var(--primary)', color: '#fff' }}
+                        >
+                          🛒 담기
+                        </button>
                         <button 
                           className="action-btn" 
                           onClick={() => handleCopy(item.content, '마크다운 본문이 클립보드에 복사되었습니다!')}
-                          style={{ flex: 1, fontWeight: 'bold' }}
+                          style={{ flex: 1, minWidth: '70px', fontWeight: 'bold' }}
                         >
-                          📋 본문 복사
+                          📋 복사
                         </button>
                         <a 
                           href={`${BACKEND_BASE}${item.url}`} 
                           download={item.filename} 
                           className="action-btn"
-                          style={{ flex: 1, textDecoration: 'none', textAlign: 'center', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          style={{ flex: 1, minWidth: '70px', textDecoration: 'none', textAlign: 'center', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
-                          📥 파일 받기
+                          📥 받기
                         </a>
                       </div>
+
                     </div>
                   ))}
                 </div>
@@ -847,10 +1071,96 @@ function App() {
                       <div className="link-url-display" style={{ margin: '4px 0 8px', fontSize: '0.85rem' }}>
                         URL: <a href={ref.content} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>{ref.content}</a>
                       </div>
-                      <span className="link-url" onClick={() => handleCopy(ref.content, '사이트 주소가 클립보드에 복사되었습니다!')} title="URL 주소 복사">
-                        📋 주소 복사
-                      </span>
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                        <button 
+                          className="action-btn" 
+                          onClick={() => addToCart('reference', ref)}
+                          style={{ flex: 1, fontWeight: 'bold', background: 'var(--primary)', borderColor: 'var(--primary)', color: '#fff', fontSize: '0.8rem', padding: '6px 12px' }}
+                        >
+                          🛒 담기
+                        </button>
+                        <button 
+                          className="action-btn" 
+                          onClick={() => handleCopy(ref.content, '사이트 주소가 클립보드에 복사되었습니다!')}
+                          style={{ flex: 1, fontWeight: 'bold', fontSize: '0.8rem', padding: '6px 12px' }}
+                        >
+                          📋 주소 복사
+                        </button>
+                      </div>
                       {ref.description && <p className="link-desc" style={{ marginTop: '10px' }}>{ref.description}</p>}
+
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {/* PROJECTS TAB */}
+        {activeTab === 'projects' && (
+          <div className="tab-pane">
+            <div className="card" style={{ marginBottom: '25px' }}>
+              <h2>💼 프로젝트 보관함 안내</h2>
+              <p className="card-desc">
+                장바구니에 담아 빌드한 프로젝트별 패키지 디렉토리 목록입니다. 
+                각 디렉토리 하위에는 선택하셨던 폰트, 템플릿, 디자인md 및 메타데이터 정보가 모여 있습니다.
+                <strong>이 디렉토리 경로를 참조하여 외부 스크립트나 AI 도구로 PPT를 자동 생성하실 수 있습니다.</strong>
+              </p>
+            </div>
+
+            <div className="list-section">
+              <h2>생성된 프로젝트 패키지 ({projects.length})</h2>
+              {projects.length === 0 ? (
+                <div className="empty-state">생성된 프로젝트가 없습니다. 폰트, 템플릿, 디자인md 탭에서 마음에 드는 리소스를 장바구니에 담아 프로젝트를 생성해 보세요!</div>
+              ) : (
+                <div className="link-grid">
+                  {projects.map(proj => (
+                    <div className="link-card" key={proj.id} style={{ borderLeft: '4px solid var(--accent)' }}>
+                      <div className="link-card-header">
+                        <span className="link-title" style={{ fontSize: '1.15rem', fontWeight: 'bold', color: 'var(--text-main)' }}>
+                          💼 {proj.title}
+                        </span>
+                        <button className="delete-btn-simple" onClick={() => handleDeleteProject(proj.id)}>🗑️</button>
+                      </div>
+                      
+                      <div style={{ marginTop: '12px', fontSize: '0.85rem' }}>
+                        <div style={{ marginBottom: '6px' }}>
+                          <strong style={{ color: 'var(--primary)' }}>디렉토리명:</strong>
+                          <code style={{ marginLeft: '6px', background: 'var(--primary-light)', padding: '2px 6px', borderRadius: '4px' }}>{proj.folder_name}</code>
+                        </div>
+                        <div style={{ marginBottom: '10px' }}>
+                          <strong style={{ color: 'var(--primary)' }}>절대 경로:</strong>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '4px' }}>
+                            <input 
+                              type="text" 
+                              readOnly 
+                              value={proj.folder_path} 
+                              style={{ flex: 1, padding: '4px 8px', fontSize: '0.78rem', background: '#f5f5f5', border: '1px solid #ddd', borderRadius: '4px' }}
+                            />
+                            <button 
+                              onClick={() => handleCopy(proj.folder_path, '프로젝트 절대 경로가 클립보드에 복사되었습니다!')} 
+                              style={{ padding: '4px 8px', fontSize: '0.78rem', cursor: 'pointer', background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: '4px' }}
+                            >
+                              경로 복사
+                            </button>
+                          </div>
+                        </div>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                          생성 시각: {new Date(proj.registered_at).toLocaleString()}
+                        </div>
+                      </div>
+
+                      <div style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
+                        <a 
+                          href={`${BACKEND_BASE}/PROJECTS/${proj.folder_name}/project_metadata.json`} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="action-btn"
+                          style={{ flex: 1, textDecoration: 'none', textAlign: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}
+                        >
+                          📋 메타데이터 보기
+                        </a>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -860,6 +1170,7 @@ function App() {
         )}
 
       </main>
+
 
       <footer className="app-footer-bottom">
         <p>© 2026 PPT Reference Vault. All Rights Reserved.</p>

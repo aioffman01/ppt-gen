@@ -7,9 +7,11 @@ import os
 from app.core.config import settings
 from app.core.database import engine, Base
 from app.api.v1.api import router as api_router
+from app.models.project import Project
 
 # Create SQLite tables on startup
 Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -29,9 +31,12 @@ app.add_middleware(
 os.makedirs(settings.FONT_DIR, exist_ok=True)
 os.makedirs(settings.TEMPLATE_DIR, exist_ok=True)
 os.makedirs(settings.DESIGN_MD_DIR, exist_ok=True)
+os.makedirs(settings.PROJECTS_DIR, exist_ok=True)
 app.mount("/FONT", StaticFiles(directory=str(settings.FONT_DIR)), name="FONT")
 app.mount("/TEMPLATE", StaticFiles(directory=str(settings.TEMPLATE_DIR)), name="TEMPLATE")
 app.mount("/DESIGN_MD", StaticFiles(directory=str(settings.DESIGN_MD_DIR)), name="DESIGN_MD")
+app.mount("/PROJECTS", StaticFiles(directory=str(settings.PROJECTS_DIR)), name="PROJECTS")
+
 
 
 

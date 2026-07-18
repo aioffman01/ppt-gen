@@ -15,11 +15,14 @@ from app.models.models import Font, Reference
 
 from app.api.v1.endpoints.templates import router as templates_router
 from app.api.v1.endpoints.design_md import router as design_md_router
+from app.api.v1.endpoints.projects import router as projects_router
 
 router = APIRouter()
 
 router.include_router(templates_router, prefix="/templates", tags=["templates"])
 router.include_router(design_md_router, prefix="/design-md", tags=["design-md"])
+router.include_router(projects_router, prefix="/projects", tags=["projects"])
+
 
 
 

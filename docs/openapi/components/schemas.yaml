@@ -171,4 +171,61 @@ DesignMDResponse:
     - content
     - registeredAt
 
+ProjectCreate:
+  type: object
+  properties:
+    title:
+      type: string
+      example: "신규 서비스 기획 발표자료"
+      description: "프로젝트 제목 (생성되는 디렉토리명으로 사용됨)"
+    font_ids:
+      type: array
+      items:
+        type: string
+      description: "장바구니에 담긴 폰트 ID 목록"
+    template_ids:
+      type: array
+      items:
+        type: string
+      description: "장바구니에 담긴 템플릿 ID 목록"
+    design_md_ids:
+      type: array
+      items:
+        type: string
+      description: "장바구니에 담긴 디자인 MD ID 목록"
+    reference_ids:
+      type: array
+      items:
+        type: string
+      description: "장바구니에 담긴 일반 참고 사이트 ID 목록"
+  required:
+    - title
+
+ProjectResponse:
+  type: object
+  properties:
+    id:
+      type: string
+      example: "172134567905"
+    title:
+      type: string
+      example: "신규 서비스 기획 발표자료"
+    folder_name:
+      type: string
+      example: "신규_서비스_기획_발표자료_172134567905"
+    folder_path:
+      type: string
+      example: "C:/Users/redof/Documents/Antigravity/PPT-Gen/PROJECTS/신규_서비스_기획_발표자료_172134567905"
+    registered_at:
+      type: string
+      format: date-time
+      example: "2026-07-19T01:30:44Z"
+  required:
+    - id
+    - title
+    - folder_name
+    - folder_path
+    - registered_at
+
+
 

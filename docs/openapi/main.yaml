@@ -23,8 +23,13 @@ paths:
     $ref: './paths/design_md.yaml'
   /design-md/{id}:
     $ref: './paths/design_md_detail.yaml'
+  /projects:
+    $ref: './paths/projects.yaml'
+  /projects/{id}:
+    $ref: './paths/projects_detail.yaml'
 components:
   schemas:
     $ref: './components/schemas.yaml'
+
 
 
