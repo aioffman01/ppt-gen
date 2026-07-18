@@ -1,0 +1,23 @@
+delete:
+  summary: 특정 디자인 MD 등록 해제 및 파일 삭제
+  description: 지정된 ID의 디자인 MD 정보를 DB에서 지우고 저장소(/DESIGN_MD)에서 해당 마크다운 파일을 삭제합니다.
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: 삭제할 디자인 MD의 ID
+  responses:
+    '200':
+      description: 삭제 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "디자인 MD 파일이 성공적으로 삭제되었습니다."
+    '404':
+      description: 해당 ID의 디자인 MD를 찾을 수 없음

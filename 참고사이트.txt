@@ -1,0 +1,6 @@
+
+[font]
+- https://noonnu.cc/ 
+
+[templete]
+https://www.canva.com/templates

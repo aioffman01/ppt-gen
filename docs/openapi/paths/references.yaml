@@ -1,0 +1,30 @@
+get:
+  summary: 모든 PPT 참고 자료 조회
+  description: 등록된 색상 팔레트 및 참고 사이트 목록을 조회합니다.
+  responses:
+    '200':
+      description: 조회 성공
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../components/schemas.yaml#/ReferenceResponse'
+post:
+  summary: 새 PPT 참고 자료 등록
+  description: 색상 팔레트 또는 참고 사이트 정보를 등록합니다.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas.yaml#/ReferenceCreate'
+  responses:
+    '201':
+      description: 등록 성공
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/ReferenceResponse'
+    '400':
+      description: 필수 필드 누락 또는 부적절한 데이터 형식

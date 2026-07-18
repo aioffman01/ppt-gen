@@ -1,0 +1,23 @@
+delete:
+  summary: 특정 PPT 참고 자료 삭제
+  description: 지정된 ID의 참고 자료(색상 팔레트, 링크 등)를 삭제합니다.
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: 삭제할 자료의 ID
+  responses:
+    '200':
+      description: 삭제 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "자료가 성공적으로 삭제되었습니다."
+    '404':
+      description: 해당 ID의 자료를 찾을 수 없음

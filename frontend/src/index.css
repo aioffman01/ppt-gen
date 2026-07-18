@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-app: #f2f4f0;
+  --bg-sidebar: #2b3a30;
+  --bg-card: #ffffff;
+  --text-main: #1c2820;
+  --text-muted: #5e6f64;
+  --text-sidebar: #a3b2a4;
+  --text-sidebar-active: #ffffff;
+  --sidebar-hover-bg: #354a3e;
+  --sidebar-active-bg: #4f6f52;
+  --primary: #4f6f52;
+  --primary-hover: #3a533d;
+  --primary-light: #ecefe6;
+  --accent: #c08261;
+  --border-color: #dbe1d9;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05);
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

@@ -1,0 +1,174 @@
+FontResponse:
+  type: object
+  properties:
+    id:
+      type: string
+      example: "172134567890"
+    title:
+      type: string
+      example: "Pretendard-Bold"
+    originalName:
+      type: string
+      example: "Pretendard-Bold.otf"
+    filename:
+      type: string
+      example: "172134567890-Pretendard-Bold.otf"
+    url:
+      type: string
+      example: "/FONT/172134567890-Pretendard-Bold.otf"
+    registeredAt:
+      type: string
+      format: date-time
+      example: "2026-07-19T00:24:32Z"
+  required:
+    - id
+    - title
+    - originalName
+    - filename
+    - url
+    - registeredAt
+
+ReferenceCreate:
+  type: object
+  properties:
+    type:
+      type: string
+      enum: [color, link]
+      example: "link"
+      description: "참고자료 종류 (color: 색상 팔레트, link: 참고 사이트 URL)"
+    title:
+      type: string
+      example: "눈누 폰트 사이트"
+      description: "참고자료의 명칭"
+    content:
+      type: string
+      example: "https://noonnu.cc/"
+      description: "참고자료의 내용 (링크 주소 또는 쉼표 구분된 헥사코드 조합)"
+    description:
+      type: string
+      example: "상업용 무료 한글 폰트를 모아둔 사이트"
+      description: "간략한 메모 및 상세 설명"
+  required:
+    - type
+    - title
+    - content
+
+ReferenceResponse:
+  type: object
+  properties:
+    id:
+      type: string
+      example: "172134567895"
+    type:
+      type: string
+      enum: [color, link]
+      example: "link"
+    title:
+      type: string
+      example: "눈누 폰트 사이트"
+    content:
+      type: string
+      example: "https://noonnu.cc/"
+    description:
+      type: string
+      example: "상업용 무료 한글 폰트를 모아둔 사이트"
+    createdAt:
+      type: string
+      format: date-time
+      example: "2026-07-19T00:24:35Z"
+  required:
+    - id
+    - type
+    - title
+    - content
+    - createdAt
+
+TemplateResponse:
+  type: object
+  properties:
+    id:
+      type: string
+      example: "172134567899"
+    title:
+      type: string
+      example: "깔끔한 비즈니스 제안서"
+    originalName:
+      type: string
+      example: "business_proposal.pptx"
+    filename:
+      type: string
+      example: "172134567899-business_proposal.pptx"
+    url:
+      type: string
+      example: "/TEMPLATE/172134567899-business_proposal.pptx"
+    description:
+      type: string
+      nullable: true
+      example: "Canva 스타일의 파랑 계열 미니멀 제안서 템플릿"
+    registeredAt:
+      type: string
+      format: date-time
+      example: "2026-07-19T00:58:50Z"
+  required:
+    - id
+    - title
+    - originalName
+    - filename
+    - url
+    - registeredAt
+
+DesignMDCreate:
+  type: object
+  properties:
+    title:
+      type: string
+      example: "포레스트앤모스 테마 가이드"
+      description: "마크다운 파일의 제목 (저장 시 파일명이 됨)"
+    description:
+      type: string
+      nullable: true
+      example: "PPT 슬라이드 디자인 가이드 및 마크다운"
+      description: "문서 설명 (선택)"
+    content:
+      type: string
+      example: "# Forest & Moss 테마 가이드\n\n이 가이드는..."
+      description: "마크다운 문서 본문 내용"
+  required:
+    - title
+    - content
+
+DesignMDResponse:
+  type: object
+  properties:
+    id:
+      type: string
+      example: "172134567900"
+    title:
+      type: string
+      example: "포레스트앤모스 테마 가이드"
+    filename:
+      type: string
+      example: "172134567900-포레스트앤모스 테마 가이드.md"
+    url:
+      type: string
+      example: "/DESIGN_MD/172134567900-포레스트앤모스 테마 가이드.md"
+    description:
+      type: string
+      nullable: true
+      example: "PPT 슬라이드 디자인 가이드 및 마크다운"
+    content:
+      type: string
+      example: "# Forest & Moss 테마 가이드\n\n이 가이드는..."
+    registeredAt:
+      type: string
+      format: date-time
+      example: "2026-07-19T01:19:57Z"
+  required:
+    - id
+    - title
+    - filename
+    - url
+    - content
+    - registeredAt
+
+

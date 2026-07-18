@@ -1,0 +1,30 @@
+openapi: 3.0.3
+info:
+  title: PPT Reference Vault API
+  description: PPT 제작 참고자료(폰트, 색상 팔레트, 사이트 링크) 관리 서비스의 API 명세서
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000/api/v1
+    description: 로컬 FastAPI 개발 서버
+paths:
+  /fonts:
+    $ref: './paths/fonts.yaml'
+  /fonts/{id}:
+    $ref: './paths/fonts_detail.yaml'
+  /references:
+    $ref: './paths/references.yaml'
+  /references/{id}:
+    $ref: './paths/references_detail.yaml'
+  /templates:
+    $ref: './paths/templates.yaml'
+  /templates/{id}:
+    $ref: './paths/templates_detail.yaml'
+  /design-md:
+    $ref: './paths/design_md.yaml'
+  /design-md/{id}:
+    $ref: './paths/design_md_detail.yaml'
+components:
+  schemas:
+    $ref: './components/schemas.yaml'
+
+

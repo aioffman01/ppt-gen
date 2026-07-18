@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+ENV/
+env/
+backend/app.db
+backend/app.db-journal
+
+# Node / Frontend
+node_modules/
+dist/
+.eslintcache
+*.log
+
+# User Uploads (Ignore actual contents, but keep folders)
+FONT/*
+!FONT/.gitkeep
+TEMPLATE/*
+!TEMPLATE/.gitkeep
+DESIGN_MD/*
+!DESIGN_MD/.gitkeep
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

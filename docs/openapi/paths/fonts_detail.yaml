@@ -1,0 +1,23 @@
+delete:
+  summary: 특정 폰트 등록 해제 및 파일 삭제
+  description: 지정된 ID의 폰트 정보를 DB에서 지우고 저장소(/FONT)에서 해당 폰트 파일을 삭제합니다.
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: 삭제할 폰트의 ID
+  responses:
+    '200':
+      description: 삭제 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "폰트가 성공적으로 삭제되었습니다."
+    '404':
+      description: 해당 ID의 폰트를 찾을 수 없음
